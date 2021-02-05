@@ -1,7 +1,9 @@
 import express from "express";
-import { UserModel } from "../schemes";
+import { UserModel } from "../models";
+
 
 class UserController {
+
   show(req: express.Request, res: express.Response) {
     const id: string = req.params.id;
 
@@ -16,7 +18,6 @@ class UserController {
   }
 
   // getMe() {
-
   // }
 
   create(req: express.Request, res: express.Response) {
@@ -40,10 +41,10 @@ class UserController {
   delete(req: express.Request, res: express.Response) {
     const id: string = req.params.id;
 
-    UserModel.findOneAndRemove({ _id: id })
+    UserModel.findOneAndDelete({ _id: id })
       .then((user: any) => {
         res.json({
-          message: `User ${user.fullname} deleted`,
+          message: `User ${ user.fullname } deleted`,
         });
       })
       .catch((err: any) => {
@@ -52,6 +53,7 @@ class UserController {
         });
       });
   }
+
 }
 
 export default UserController;

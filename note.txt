@@ -5,12 +5,8 @@ dialogs:
 - created_at
 - updated_at
 
-
-
 message:
 - _id
-- author
-- partner
 - text
 - dialog
 - read
