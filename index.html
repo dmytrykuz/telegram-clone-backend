@@ -15,9 +15,9 @@
 
           window.socket = socket;
 
-          socket.on("111", function(msg) {
-            console.log("Message: ", msg);
-          });
+          socket.on("SERVER:NEW_MESSAGE", function(msg) {
+            console.log("New message: ", msg );
+            if(window.user !== msg.author)
 
           socket.emit("222", "Test message from client");
         </script>

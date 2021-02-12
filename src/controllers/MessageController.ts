@@ -1,10 +1,15 @@
 import express from "express";
 import { MessageModel } from "../models";
-
+import socket from "socket.io";
 
 class MessageController {
+  io: socket.Server;
 
-  show(req: express.Request, res: express.Response) {
+  constructor(io: socket.Server) {
+    this.io = io;
+  }
+
+  show = (req: express.Request, res: express.Response) => {
     const dialogId: string = req.query.dialog as string;
 
     MessageModel.find({ dialog: dialogId })
@@ -17,10 +22,10 @@ class MessageController {
         }
         return res.json(messages);
       });
-  }
+  };
 
-  create(req: express.Request, res: express.Response) {
-    const userId: string = req.query._id as string;
+  create = (req: express.Request, res: express.Response) => {
+    const userId: string = req.user._id;
 
     const messageData = {
       text: req.body.text,
@@ -33,14 +38,22 @@ class MessageController {
     message
       .save()
       .then((obj: any) => {
-        return res.json(obj);
+        obj.populate("dialog", (err: any, message: any) => {
+          if (err) {
+            return res.status(500).json({
+              message: err,
+            });
+          }
+          this.io.emit("SERVER:NEW_MESSAGE", message);
+          return res.json(message);
+        });
       })
       .catch((err: any) => {
         return res.json(err);
       });
-  }
+  };
 
-  delete(req: express.Request, res: express.Response) {
+  delete = (req: express.Request, res: express.Response) => {
     const id: string = req.query.id as string;
 
     MessageModel.findOneAndDelete({ _id: id })
@@ -56,8 +69,7 @@ class MessageController {
           message: "Message not found",
         });
       });
-  }
-
+  };
 }
 
 export default MessageController;

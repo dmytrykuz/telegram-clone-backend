@@ -4,17 +4,17 @@ import { validationResult } from "express-validator";
 import { UserModel } from "../models";
 import { IUser } from "../models/User";
 import { createJWTToken } from "../utils";
-const socket = require("socket.io");
+import socket from "socket.io";
 
 class UserController {
 
-  // constructor() {
-  //   socket.on("connection", function(socket: any) {
-  //     //
-  //   })
-  // }
+  io: socket.Server;
 
-  show(req: express.Request, res: express.Response) {
+  constructor(io: socket.Server) {
+    this.io = io;
+  }
+
+  show = (req: express.Request, res: express.Response) => {
     const id: string = req.params.id;
 
     UserModel.findById(id, (err: any, user: any) => {
@@ -27,7 +27,7 @@ class UserController {
     });
   }
 
-  getMe(req: express.Request, res: express.Response, socket: any) {
+  getMe = (req: express.Request, res: express.Response, socket: any) => {
     const id: string = req.user._id;
 
     UserModel.findById(id, (err: any, user: any) => {
@@ -40,7 +40,7 @@ class UserController {
     });
   }
 
-  create(req: express.Request, res: express.Response) {
+  create = (req: express.Request, res: express.Response) => {
     const userData = {
       email: req.body.email,
       fullname: req.body.fullname,
@@ -58,13 +58,13 @@ class UserController {
       });
   }
 
-  delete(req: express.Request, res: express.Response) {
+  delete = (req: express.Request, res: express.Response) => {
     const id: string = req.params.id;
 
     UserModel.findOneAndDelete({ _id: id })
       .then((user: any) => {
         res.json({
-          message: `User ${ user.fullname } deleted`,
+          message: `User ${user.fullname} deleted`,
         });
       })
       .catch((err: any) => {
@@ -74,7 +74,7 @@ class UserController {
       });
   }
 
-  login(req: express.Request, res: express.Response) {
+  login = (req: express.Request, res: express.Response) => {
     const loginData = {
       email: req.body.email,
       password: req.body.password,

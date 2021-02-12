@@ -1,9 +1,16 @@
 import express from "express";
 import { DialogModel, MessageModel } from "../models";
-
+import socket from "socket.io";
 
 class DialogController {
-  show(req: express.Request, res: express.Response) {
+
+  io: socket.Server;
+
+  constructor(io: socket.Server) {
+    this.io = io;
+  }
+
+  show = (req: express.Request, res: express.Response) => {
     const userId: string = req.user._id;
 
     DialogModel.findOne({ author: userId })
@@ -18,7 +25,7 @@ class DialogController {
       });
   }
 
-  create(req: express.Request, res: express.Response) {
+  create = (req: express.Request, res: express.Response) => {
     const dialogData = {
       author: req.user._id,
       partner: req.body.partner,
@@ -51,7 +58,7 @@ class DialogController {
       });
   }
 
-  delete(req: express.Request, res: express.Response) {
+  delete = (req: express.Request, res: express.Response) => {
     const id: string = req.params.id;
 
     DialogModel.findOneAndDelete({ _id: id })
