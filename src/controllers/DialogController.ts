@@ -3,11 +3,10 @@ import { DialogModel, MessageModel } from "../models";
 
 
 class DialogController {
-
   show(req: express.Request, res: express.Response) {
-    const authorId: string = req.query.id as string;
+    const userId: string = req.user._id;
 
-    DialogModel.findOne({ author: authorId })
+    DialogModel.findOne({ author: userId })
       .populate(["author", "partner"])
       .exec(function (err: any, dialogs: any) {
         if (err) {
@@ -21,7 +20,7 @@ class DialogController {
 
   create(req: express.Request, res: express.Response) {
     const dialogData = {
-      author: req.body.author,
+      author: req.user._id,
       partner: req.body.partner,
     };
 
@@ -38,17 +37,16 @@ class DialogController {
 
         message
           .save()
-          .then((messageObj: any) => {
+          .then(() => {
             return res.json({
               dialog: dialogObj,
-              // message: messageObj,
             });
           })
-          .catch(err => {
+          .catch((err) => {
             return res.json(err);
           });
       })
-      .catch(err => {
+      .catch((err) => {
         return res.json(err);
       });
   }
@@ -64,13 +62,12 @@ class DialogController {
           });
         }
       })
-      .catch((err: any) => {
+      .catch(() => {
         return res.json({
           message: "Dialog not found",
         });
       });
   }
-
 }
 
 export default DialogController;

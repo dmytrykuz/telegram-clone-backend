@@ -20,7 +20,7 @@ class MessageController {
   }
 
   create(req: express.Request, res: express.Response) {
-    const userId = "601c385852971208308e20d4";
+    const userId: string = req.query._id as string;
 
     const messageData = {
       text: req.body.text,
