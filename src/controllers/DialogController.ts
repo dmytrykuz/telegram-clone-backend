@@ -3,7 +3,6 @@ import { DialogModel, MessageModel } from "../models";
 import socket from "socket.io";
 
 class DialogController {
-
   io: socket.Server;
 
   constructor(io: socket.Server) {
@@ -23,7 +22,7 @@ class DialogController {
         }
         return res.json(dialogs);
       });
-  }
+  };
 
   create = (req: express.Request, res: express.Response) => {
     const dialogData = {
@@ -56,7 +55,7 @@ class DialogController {
       .catch((err) => {
         return res.json(err);
       });
-  }
+  };
 
   delete = (req: express.Request, res: express.Response) => {
     const id: string = req.params.id;
@@ -74,7 +73,7 @@ class DialogController {
           message: "Dialog not found",
         });
       });
-  }
+  };
 }
 
 export default DialogController;

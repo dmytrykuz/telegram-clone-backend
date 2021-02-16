@@ -7,7 +7,6 @@ import { createJWTToken } from "../utils";
 import socket from "socket.io";
 
 class UserController {
-
   io: socket.Server;
 
   constructor(io: socket.Server) {
@@ -25,20 +24,20 @@ class UserController {
       }
       return res.json(user);
     });
-  }
+  };
 
   getMe = (req: express.Request, res: express.Response, socket: any) => {
     const id: string = req.user._id;
 
     UserModel.findById(id, (err: any, user: any) => {
-      if (err) {
+      if (err || !user) {
         return res.status(404).json({
           message: "User not found",
         });
       }
       return res.json(user);
     });
-  }
+  };
 
   create = (req: express.Request, res: express.Response) => {
     const userData = {
@@ -47,6 +46,8 @@ class UserController {
       password: req.body.password,
     };
 
+    const errors = validationResult(req);
+
     const user = new UserModel(userData);
     user
       .save()
@@ -54,9 +55,12 @@ class UserController {
         res.json(obj);
       })
       .catch((err) => {
-        res.json(err);
+        res.status(500).json({
+          status: "error",
+          message: err,
+        });
       });
-  }
+  };
 
   delete = (req: express.Request, res: express.Response) => {
     const id: string = req.params.id;
@@ -72,7 +76,39 @@ class UserController {
           message: "User not found",
         });
       });
-  }
+  };
+
+  verify = (req: express.Request, res: express.Response) => {
+    const hash = req.query.hash;
+
+    if (!hash) {
+      return res.status(422).json({ errors: "Invalid hash" });
+    }
+
+    UserModel.findOne({ confirm_hash: hash as string }, (err: any, user: any) => {
+      if (err || !user) {
+        return res.status(404).json({
+          status: "error",
+          message: "Hash not found",
+        });
+      }
+
+      user.confirmed = true;
+
+      user.save((err: any) => {
+        if (err) {
+          return res.status(404).json({
+            status: "error",
+            message: err,
+          });
+        }
+        return res.json({
+          status: "success",
+          message: "Аккаунт успішно підтверджений!"
+        })
+      })
+    });
+  };
 
   login = (req: express.Request, res: express.Response) => {
     const loginData = {
@@ -86,7 +122,7 @@ class UserController {
     }
 
     UserModel.findOne({ email: loginData.email }, (err: any, user: IUser) => {
-      if (err) {
+      if (err || !user) {
         return res.status(404).json({
           Message: "User not found",
         });
@@ -105,7 +141,7 @@ class UserController {
         });
       }
     });
-  }
+  };
 }
 
 export default UserController;

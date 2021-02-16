@@ -5,9 +5,10 @@ import dotenv from "dotenv";
 import "./core/db";
 import createRoutes from "./core/routes";
 import createSocket from "./core/socket";
-
+import cors from "cors";
 
 const app = express();
+app.use(cors());
 const http = createServer(app);
 const io = createSocket(http);
 

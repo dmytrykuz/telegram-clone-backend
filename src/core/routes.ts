@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import socket from "socket.io";
 import { checkAuth, updateLastSeen } from "../middlewares";
-import { loginValidation } from "../utils/validation";
+import { loginValidation, registrationValidation } from "../utils/validation";
 import { DialogController, MessageController, UserController } from "../controllers";
 
 
@@ -16,10 +16,11 @@ const createRoutes = (app: express.Express, io: socket.Server) => {
   app.use(checkAuth);
 
   app.get("/user/me", User.getMe);
+  app.get("/user/verify", User.verify);
   app.get("/user/:id", User.show);
-  app.post("/user/registration", User.create);
-  app.delete("/user/:id", User.delete);
   app.post("/user/login", loginValidation, User.login);
+  app.post("/user/registration", registrationValidation, User.create);
+  app.delete("/user/:id", User.delete);
 
   app.get("/dialogs", Dialog.show);
   app.post("/dialogs", Dialog.create);

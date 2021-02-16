@@ -2,7 +2,6 @@ import mongoose, { Schema, Document } from "mongoose";
 import validator from "validator";
 import { generatePasswordHash } from "../utils";
 
-
 export interface IUser extends Document {
   email: string;
   fullname: string;
@@ -46,7 +45,7 @@ const UserScheme = new Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 UserScheme.pre<IUser>("save", function (next) {
@@ -55,15 +54,17 @@ UserScheme.pre<IUser>("save", function (next) {
   if (!user.isModified("password")) return next();
 
   generatePasswordHash(user.password)
-    .then(hash => {
+    .then((hash) => {
       user.password = String(hash);
-      next();
+      generatePasswordHash(new Date().toString()).then((confirmHash) => {
+        user.confirm_hash = String(confirmHash);
+        next();
+      });
     })
-    .catch(err => {
+    .catch((err) => {
       next(err);
     });
 });
-
 
 const UserModel = mongoose.model<IUser>("User", UserScheme);
 

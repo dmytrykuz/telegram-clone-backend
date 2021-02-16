@@ -1,4 +1,4 @@
-import jwt, { VerifyErrors } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { IUser } from "../models/User";
 
 

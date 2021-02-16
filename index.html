@@ -1,25 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
-</head>
-    <body>
-        <script src="https://cdn.socket.io/3.1.1/socket.io.min.js"></script>
+  </head>
+  <body>
+    <script src="https://cdn.socket.io/3.1.1/socket.io.min.js"></script>
 
-        <script>
-          const socket = io("http://localhost:4000", { transports : [ "websocket" ]});
+    <script>
+      const socket = io("http://localhost:4000", { transports: ["websocket"] });
 
-          window.socket = socket;
+      window.socket = socket;
 
-          socket.on("SERVER:NEW_MESSAGE", function(msg) {
-            console.log("New message: ", msg );
-            if(window.user !== msg.author)
+      socket.on("SERVER:NEW_MESSAGE", function (msg) {
+        if (window.user !== msg.user) {
+          console.log("New message: ", msg);
+        }
+      });
 
-          socket.emit("222", "Test message from client");
-        </script>
-    </body>
+      socket.emit("222", "Test message from client");
+    </script>
+  </body>
 </html>
