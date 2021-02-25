@@ -35,6 +35,7 @@ class UserController {
           message: "User not found",
         });
       }
+      console.log(user.isOnline);
       return res.json(user);
     });
   };
@@ -85,29 +86,32 @@ class UserController {
       return res.status(422).json({ errors: "Invalid hash" });
     }
 
-    UserModel.findOne({ confirm_hash: hash as string }, (err: any, user: any) => {
-      if (err || !user) {
-        return res.status(404).json({
-          status: "error",
-          message: "Hash not found",
-        });
-      }
-
-      user.confirmed = true;
-
-      user.save((err: any) => {
-        if (err) {
+    UserModel.findOne(
+      { confirm_hash: hash as string },
+      (err: any, user: any) => {
+        if (err || !user) {
           return res.status(404).json({
             status: "error",
-            message: err,
+            message: "Hash not found",
           });
         }
-        return res.json({
-          status: "success",
-          message: "Аккаунт успішно підтверджений!"
-        })
-      })
-    });
+
+        user.confirmed = true;
+
+        user.save((err: any) => {
+          if (err) {
+            return res.status(404).json({
+              status: "error",
+              message: err,
+            });
+          }
+          return res.json({
+            status: "success",
+            message: "Аккаунт успішно підтверджений!",
+          });
+        });
+      }
+    );
   };
 
   login = (req: express.Request, res: express.Response) => {
@@ -135,7 +139,7 @@ class UserController {
           token,
         });
       } else {
-        return res.json({
+        return res.status(403).json({
           status: "error",
           message: "Incorrect email or password",
         });

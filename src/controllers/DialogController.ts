@@ -12,8 +12,15 @@ class DialogController {
   show = (req: express.Request, res: express.Response) => {
     const userId: string = req.user._id;
 
-    DialogModel.findOne({ author: userId })
+    DialogModel.find()
+      .or([{ author: userId }, { partner: userId }])
       .populate(["author", "partner"])
+      .populate({
+        path: "lastMessage",
+        populate: {
+          path: "user",
+        },
+      })
       .exec(function (err: any, dialogs: any) {
         if (err) {
           return res.status(404).json({
