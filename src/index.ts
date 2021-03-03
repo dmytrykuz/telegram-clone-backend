@@ -8,7 +8,7 @@ import createSocket from "./core/socket";
 import cors from "cors";
 
 const app = express();
-app.use(cors());
+// app.use(cors({ origin: '*' }));
 const http = createServer(app);
 const io = createSocket(http);
 
