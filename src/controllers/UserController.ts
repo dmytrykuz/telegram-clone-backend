@@ -35,9 +35,25 @@ class UserController {
           message: "User not found",
         });
       }
-      console.log(user.isOnline);
       return res.json(user);
     });
+  };
+
+  findUsers = (req: express.Request, res: express.Response) => {
+    const query: any = req.query.query;
+
+    UserModel.find()
+      .or([
+        { fullname: new RegExp(query, "i") },
+        { email: new RegExp(query, "i") },
+      ])
+      .then((users: any) => res.json(users))
+      .catch((err: any) => {
+        return res.status(404).json({
+          status: "error",
+          message: err,
+        });
+      });
   };
 
   create = (req: express.Request, res: express.Response) => {

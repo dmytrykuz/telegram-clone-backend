@@ -22,7 +22,7 @@ const UserScheme = new Schema(
       validate: [validator.isEmail, "Invalid email"],
       index: {
         unique: true,
-        dropDups: true,
+        // dropDups: true,
       },
     },
     fullname: {
@@ -53,7 +53,7 @@ const UserScheme = new Schema(
 );
 
 UserScheme.virtual("isOnline").get(function (this: any) {
-  console.log(differenceInMinutes(new Date(), this.last_seen));
+  // console.log(differenceInMinutes(new Date(), this.last_seen));
   return differenceInMinutes(new Date(), this.last_seen) < 5;
 });
 

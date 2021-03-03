@@ -31,42 +31,66 @@ class DialogController {
       });
   };
 
-  create = (req: express.Request, res: express.Response) => {
+  create = (req: express.Request, res: express.Response): void => {
     const dialogData = {
       author: req.user._id,
       partner: req.body.partner,
     };
 
-    const dialog = new DialogModel(dialogData);
+    DialogModel.findOne(
+      {
+        author: req.user._id,
+        partner: req.body.partner,
+      },
+      (err: any, dialog: any) => {
+        if (err) {
+          return res.status(500).json({
+            status: "error",
+            message: err,
+          });
+        }
+        if (dialog) {
+          return res.status(403).json({
+            status: "error",
+            message: "Such a dialogue already exists",
+          });
+        } else {
+          const dialog = new DialogModel(dialogData);
 
-    dialog
-      .save()
-      .then((dialogObj: any) => {
-        const message = new MessageModel({
-          text: req.body.text,
-          user: req.body.author,
-          dialog: dialogObj._id,
-        });
+          dialog
+            .save()
+            .then((dialogObj) => {
+              const message = new MessageModel({
+                text: req.body.text,
+                user: req.user._id,
+                dialog: dialogObj._id,
+              });
 
-        message
-          .save()
-          .then(() => {
-            dialogObj.lastMessage = message._id;
-            dialogObj.save().then(() => {
-              res.json(dialogObj);
-              this.io.emit("SERVER:CREATE_DIALOG", {
-                ...dialogData,
-                dialog: dialogObj,
+              message
+                .save()
+                .then(() => {
+                  dialogObj.lastMessage = message._id;
+                  dialogObj.save().then(() => {
+                    res.json(dialogObj);
+                    this.io.emit("SERVER:CREATE_DIALOG", {
+                      ...dialogData,
+                      dialog: dialogObj,
+                    });
+                  });
+                })
+                .catch((err) => {
+                  res.json(err);
+                });
+            })
+            .catch((err) => {
+              res.json({
+                status: "error",
+                message: err,
               });
             });
-          })
-          .catch((err) => {
-            return res.json(err);
-          });
-      })
-      .catch((err) => {
-        return res.json(err);
-      });
+        }
+      }
+    );
   };
 
   delete = (req: express.Request, res: express.Response) => {
