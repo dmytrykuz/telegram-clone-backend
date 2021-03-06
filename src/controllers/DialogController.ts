@@ -27,6 +27,8 @@ class DialogController {
             message: "Dialogs not found",
           });
         }
+
+        
         return res.json(dialogs);
       });
   };

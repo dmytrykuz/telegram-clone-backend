@@ -9,14 +9,43 @@ class MessageController {
     this.io = io;
   }
 
+  updateReadedStatus = (
+    res: express.Response,
+    userId: string,
+    dialogId: string
+  ): void => {
+    MessageModel.updateMany(
+      { dialog: dialogId, user: { $ne: userId } },
+      { $set: { readed: true } },
+      {},
+      (err: any): void => {
+        if (err) {
+          res.status(500).json({  
+            status: "error",
+            message: err,
+          });
+        } else {
+          this.io.emit("SERVER:MESSAGES_READED", {
+            userId,
+            dialogId,
+          });
+        }
+      }
+    );
+  };
+
   show = (req: express.Request, res: express.Response) => {
     const dialogId: string = req.query.dialog as string;
+    const userId: string = req.user._id as string;
+
+    this.updateReadedStatus(res, userId, dialogId);
 
     MessageModel.find({ dialog: dialogId })
       .populate(["dialog", "user"])
       .exec((err: any, messages: any) => {
         if (err) {
           return res.status(404).json({
+            status: "error",
             message: "Messages not found",
           });
         }
