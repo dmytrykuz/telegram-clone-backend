@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import dotenv from "dotenv";
+dotenv.config();
 
 import "./core/db";
 import createRoutes from "./core/routes";
@@ -12,7 +13,6 @@ const app = express();
 const http = createServer(app);
 const io = createSocket(http);
 
-dotenv.config();
 
 createRoutes(app, io);
 

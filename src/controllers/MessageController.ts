@@ -20,7 +20,7 @@ class MessageController {
       {},
       (err: any): void => {
         if (err) {
-          res.status(500).json({  
+          res.status(500).json({
             status: "error",
             message: err,
           });
@@ -41,7 +41,7 @@ class MessageController {
     this.updateReadedStatus(res, userId, dialogId);
 
     MessageModel.find({ dialog: dialogId })
-      .populate(["dialog", "user"])
+      .populate(["dialog", "user", "attachments"])
       .exec((err: any, messages: any) => {
         if (err) {
           return res.status(404).json({
@@ -60,6 +60,7 @@ class MessageController {
       text: req.body.text,
       dialog: req.body.dialog_id,
       user: userId,
+      attachments: req.body.attachments,
     };
 
     const message = new MessageModel(messageData);
@@ -67,7 +68,7 @@ class MessageController {
     message
       .save()
       .then((obj: any) => {
-        obj.populate(["dialog", "user"], (err: any, message: any) => {
+        obj.populate(["dialog", "user", "attachments"], (err: any, message: any) => {
           if (err) {
             return res.status(500).json({
               status: "error",
